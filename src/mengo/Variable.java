@@ -10,6 +10,41 @@ package mengo;
  * @author Jullian
  */
 public class Variable {
+
     ID idAttributes;
-    String value;
+    private String Stringvalue;
+    private Boolean Boolvalue;
+    private Double Numbervalue;
+
+    Object getValue() {
+        if (idAttributes.getDataType() == DataType.BOOLEAN) {
+            return Boolvalue;
+        }
+        if (idAttributes.getDataType() == DataType.NUMBER) {
+            return Numbervalue;
+        }
+        if (idAttributes.getDataType() == DataType.STRING) {
+            return Stringvalue;
+        }
+        return Stringvalue;
+    }
+
+    void setValue(Object A) {
+        if (A.getClass() == String.class) {
+            Stringvalue =(String) A;
+            Boolvalue =  null;
+            Numbervalue = null;
+        }
+        if (A.getClass() == Boolean.class) {
+            Stringvalue =null;
+            Boolvalue =  (Boolean)A;
+            Numbervalue = null;
+        }
+        if (A.getClass() == Double.class) {
+            Stringvalue =null;
+            Boolvalue =  null;
+            Numbervalue = (Double)A;
+        }
+
+    }
 }

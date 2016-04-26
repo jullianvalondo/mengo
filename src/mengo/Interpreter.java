@@ -15,51 +15,88 @@ import java.util.Stack;
  */
 public class Interpreter {
 
+    RuleMatch Matcher = new RuleMatch();
     Boolean ErrorFound;
     HashMap<String, TaskObject> TaskMap = new HashMap();
-    ArrayList<Variable> GlobalVariable;
-    Stack<ArrayList<Variable>> LocalVariable;
+    HashMap<String, Variable> GlobalVariable;
+    Stack<HashMap<String, Variable>> LocalVariable;
     //working variable
     ArrayList<ID> TemporaryProtocol;
+
     Interpreter() {
         ErrorFound = false;
     }
 
     void interpret(TreeNode root) {
         //
+        //System.out.println("FirstPass");
         FirstPass(root);
         //if error is found on first pass.
         if (ErrorFound) {
             System.out.println("Error Found");
-            
+
         } else {
-            
+            Program(root);
         }
     }
-    void Program(TreeNode root){
-        GlobalVariable = new ArrayList();
+
+    void Program(TreeNode root) {
+        //check if Initialization exist
+        if (Matcher.Match("1", root) || Matcher.Match("2", root)) {
+            GlobalVariable = new HashMap();
+            //initialization exist
+            TreeNode initialization = root.getTree("initialization");
+            Initialization(initialization);
+        }
         LocalVariable = new Stack();
     }
-    
-    
-    
-    
+    void Initialization(TreeNode Initialization){
+        
+    }
+    //void 
+    //checks data type 
+    void assign(HashMap<String, Variable> currentTable, String idName, Object Value) {
+        //insert casting here
+        Cast castValue = new Cast(Value);
+        //get Variable
+        Variable currentVariable = currentTable.get(idName);
+        switch(currentVariable.idAttributes.getDataType()){
+            case NUMBER:
+                updateVariable(currentVariable, castValue.getNUMBER());
+                break;
+            case BOOLEAN:
+                updateVariable(currentVariable, castValue.getBOOLEAN());
+                break;
+            case STRING:
+                updateVariable(currentVariable, castValue.getSTRING());
+                break;
+        }
+    }
+    //checks if permanent
+    void updateVariable(Variable a, Object Value) {
+        if (a.idAttributes.IsPermanent() == false) {
+            a.setValue(Value);
+        } else {
+            System.out.println("Invalid assignment to: " + a.idAttributes.getIDName());
+        }
+    }
 
     void FirstPass(TreeNode root) {
         //Create map for task id and root reference, parameter protocol.
         createTaskMap(root);
         //System.out.println(TaskMap.toString());
     }
-    void addTaskAttribute(String idName, TaskObject taskAttribute){
+
+    void addTaskAttribute(String idName, TaskObject taskAttribute) {
         //System.out.println(taskAttribute.toString());
         TaskMap.put(idName, taskAttribute);
     }
+
     void createTaskMap(TreeNode root) {
         //check if main root contains TASK
         while (root.getChildren().size() >= 5 && root.getChildren().get(4).getValue() == "task") {
             //root == Task
             root = root.getChildren().get(4);
-
 
             TreeNode TaskDeclaration = root.getChildren().get(0);
             if (TaskDeclaration.getValue() == "taskdeclaration") {
@@ -67,24 +104,19 @@ public class Interpreter {
                 if (tempID.getKind() == TokenType.ID) {
                     //System.out.println("task found: " + tempID.getLexeme());
                     //check if taskdeclaration contains parameter passing through 3rd token
-                    if(TaskDeclaration.getChild(2).token.getKind() == TokenType.PERIOD){
+                    if (TaskDeclaration.getChild(2).token.getKind() == TokenType.PERIOD) {
                         //if taskdeclaration -> task id period
-                        addTaskAttribute(tempID.getLexeme(),new TaskObject(tempID.getLexeme(), root, 0, new <ID> ArrayList()));
-                    }
-                    else if(TaskDeclaration.getChild(2).token.getKind() == TokenType.INVOLVES){
+                        addTaskAttribute(tempID.getLexeme(), new TaskObject(tempID.getLexeme(), root, 0, new <ID> ArrayList()));
+                    } else if (TaskDeclaration.getChild(2).token.getKind() == TokenType.INVOLVES) {
                         TemporaryProtocol = new ArrayList();
                         int NumberOfChild = CheckParamList(TaskDeclaration.getChild(4));
-                        addTaskAttribute(tempID.getLexeme(),new TaskObject(tempID.getLexeme(), root, NumberOfChild, TemporaryProtocol));
-                    }
-                    else{
+                        addTaskAttribute(tempID.getLexeme(), new TaskObject(tempID.getLexeme(), root, NumberOfChild, TemporaryProtocol));
+                    } else {
                         System.out.println("Invalid children for taskcalldeclaration.");
                         ErrorFound = true;
                         return;
                     }
-                    
-                    
                     //assign the parent and parameter size to ID
-                    
                 }
             } else {
                 System.out.println("Error Invalid Tree for TASK");
@@ -93,67 +125,62 @@ public class Interpreter {
             }
         }
     }
+
     //counts number of parameters
-    int CheckParamList(TreeNode TaskCallDec){
-        if(TaskCallDec.Variable != "taskcalldec"){
+
+    int CheckParamList(TreeNode TaskCallDec) {
+        if (TaskCallDec.Variable != "taskcalldec") {
             System.out.println("Error in checking parameter list. Wrong Tree Input.");
             return 0;
-        }
-        else{
+        } else {
             //traverse declaration child to instantiate
-            
+
             //if production taskcalldec -> DECLARATION
-            if (TaskCallDec.getChildren().size() == 1 && TaskCallDec.getChild(0).Variable == "declaration" ){
+            if (TaskCallDec.getChildren().size() == 1 && TaskCallDec.getChild(0).Variable == "declaration") {
                 TreeNode Declaration = TaskCallDec.getChild(0);
                 UpdateTempParamList(Declaration);
-                
+
                 return 1;
-            }
-            //traverse to suceeding taskcalldec
-            else if(TaskCallDec.getChildren().size() == 3 && TaskCallDec.getChild(0).Variable == "declaration"){
+            } //traverse to suceeding taskcalldec
+            else if (TaskCallDec.getChildren().size() == 3 && TaskCallDec.getChild(0).Variable == "declaration") {
                 TreeNode Declaration = TaskCallDec.getChild(0);
                 UpdateTempParamList(Declaration);
                 return CheckParamList(TaskCallDec.getChild(2)) + 1;
-            }
-            else{
+            } else {
                 System.out.println("Error in TaskCallDec Tree Child");
                 ErrorFound = true;
                 return 0;
             }
         }
     }
-    void UpdateTempParamList(TreeNode Declaration){
-        if(Declaration.Variable == "declaration"){
+
+    void UpdateTempParamList(TreeNode Declaration) {
+        if (Declaration.Variable == "declaration") {
             //System.out.println(Declaration.getChildren());
             //check if permanent
-            if(Declaration.getChild(0).token != null && Declaration.getChild(0).token.getKind() == TokenType.PERMANENT){
+            if (Declaration.getChild(0).token != null && Declaration.getChild(0).token.getKind() == TokenType.PERMANENT) {
                 //System.out.println("Permanent");
                 String idName = Declaration.getChild(2).token.getLexeme();
                 DataType dt = DataType.valueOf(Declaration.getChild(1).getChild(0).token.getKind().name());
                 ID tempID = new ID(idName, dt, true);
                 TemporaryProtocol.add(tempID);
                 //System.out.println(tempID.toString());
-            }
-            else if(Declaration.getChild(0).getValue() == "datatype"){
+            } else if (Declaration.getChild(0).getValue() == "datatype") {
                 //System.out.println("Not permanent.");
                 String idName = Declaration.getChild(1).token.getLexeme();
                 DataType dt = DataType.valueOf(Declaration.getChild(0).getChild(0).token.getKind().name());
                 ID tempID = new ID(idName, dt, false);
                 TemporaryProtocol.add(tempID);
                 //System.out.println(tempID.toString());
-            }
-            else{
+            } else {
                 System.out.println("Invalid Children of Declaration.");
                 ErrorFound = true;
                 return;
             }
-        }
-        else{
+        } else {
             System.out.println("Invalid Tree for declaration.");
             ErrorFound = true;
             return;
         }
     }
 }
-
-

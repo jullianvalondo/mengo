@@ -7,28 +7,41 @@ package mengo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
  * @author Jullian
  */
-public class RuleMatch {
+public final class RuleMatch {
 
-    HashMap<String, Rule> RuleSet;
+    HashMap<String, Rule> RuleSet = new HashMap();
 
-    public void FillNumberOfProductionsPerStates() {
+    RuleMatch() {
+        FillNumberOfProductionsPerStates();
+    }
 
-        //sample rules for pseudo grammar
-        //production number, new rule(production number, left hand side, rhs items)
-        //RuleTable.put("1", new Rule("1", "A", 3));
-        //RuleTable.put("2", new Rule("2", "A", 1));
-        //RuleTable.put("0", new Rule("0", "S'", 1));
-        //RuleTable.put("1", new Rule("1", "S", 2));
-        //RuleTable.put("2", new Rule("2", "X", 2));
-        //RuleTable.put("3", new Rule("3", "X", 1));
+    boolean Match(String Rule, TreeNode head) {
+
+        Rule checker = RuleSet.get(Rule);
+
+        return checker.MatchChildren(head);
+    }
+
+    void printProd() {
+        Iterator it = RuleSet.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            System.out.println(pair.getValue());
+            //it.remove(); // avoids a ConcurrentModificationException
+        }
+    }
+
+    void FillNumberOfProductionsPerStates() {
+
         //rules for mengo grammar
         ArrayList<TreeNode> tempprod = new ArrayList();
-        tempprod.clear();
         tempprod.add(new TreeNode(new Token(TokenType.HELLO)));
         tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
         tempprod.add(new TreeNode("initialization"));
@@ -36,12 +49,42 @@ public class RuleMatch {
         tempprod.add(new TreeNode("task"));
         tempprod.add(new TreeNode(new Token(TokenType.GOODBYE)));
         tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
-        
+
         RuleSet.put("1", new Rule("1", "program", 7, tempprod));
-        RuleSet.put("2", new Rule("2", "program", 6));
-        RuleSet.put("3", new Rule("3", "program", 6));
-        RuleSet.put("4", new Rule("4", "program", 5));
-        RuleSet.put("5", new Rule("5", "main", 5));
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode(new Token(TokenType.HELLO)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("initialization"));
+        tempprod.add(new TreeNode("main"));
+        tempprod.add(new TreeNode(new Token(TokenType.GOODBYE)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+
+        RuleSet.put("2", new Rule("2", "program", 6, tempprod));
+
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode(new Token(TokenType.HELLO)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("main"));
+        tempprod.add(new TreeNode("task"));
+        tempprod.add(new TreeNode(new Token(TokenType.GOODBYE)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        RuleSet.put("3", new Rule("3", "program", 6, tempprod));
+
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode(new Token(TokenType.HELLO)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("main"));
+        tempprod.add(new TreeNode(new Token(TokenType.GOODBYE)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        RuleSet.put("4", new Rule("4", "program", 5, tempprod));
+
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode(new Token(TokenType.STARTHERE)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("statements"));
+        tempprod.add(new TreeNode(new Token(TokenType.ENDHERE)));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        RuleSet.put("5", new Rule("5", "main", 5, tempprod));
         RuleSet.put("6", new Rule("6", "main", 4));
         RuleSet.put("7", new Rule("7", "task", 5));
         RuleSet.put("8", new Rule("8", "task", 4));
@@ -58,10 +101,31 @@ public class RuleMatch {
         RuleSet.put("19", new Rule("19", "datatype", 1));
         RuleSet.put("20", new Rule("20", "datatype", 1));
         RuleSet.put("21", new Rule("21", "datatype", 1));
-        RuleSet.put("22", new Rule("22", "initialization", 3));
-        RuleSet.put("23", new Rule("23", "initialization", 5));
-        RuleSet.put("24", new Rule("24", "initialization", 2));
-        RuleSet.put("25", new Rule("25", "initialization", 4));
+
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode("declaration"));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("initialization"));
+        RuleSet.put("22", new Rule("22", "initialization", 3, tempprod));
+        
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode("declaration"));
+        tempprod.add(new TreeNode(new Token(TokenType.BE)));
+        tempprod.add(new TreeNode("value"));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));
+        tempprod.add(new TreeNode("initialization"));        
+        RuleSet.put("23", new Rule("23", "initialization", 5, tempprod));
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode("declaration"));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));     
+        RuleSet.put("24", new Rule("24", "initialization", 2, tempprod));
+        
+        tempprod = new ArrayList();
+        tempprod.add(new TreeNode("declaration"));
+        tempprod.add(new TreeNode(new Token(TokenType.BE)));
+        tempprod.add(new TreeNode("value"));
+        tempprod.add(new TreeNode(new Token(TokenType.PERIOD)));        
+        RuleSet.put("25", new Rule("25", "initialization", 4, tempprod));
         RuleSet.put("26", new Rule("26", "statements", 2));
         RuleSet.put("27", new Rule("27", "statements", 2));
         RuleSet.put("28", new Rule("28", "statements", 2));
