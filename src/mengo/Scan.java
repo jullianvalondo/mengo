@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Scanner {
+public class Scan {
 
     public HashMap<String, Token> ReservedWordsTable = new HashMap();
     public HashMap<String, Token> IdentifierTable = new HashMap();

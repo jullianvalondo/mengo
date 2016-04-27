@@ -75,7 +75,9 @@ public class TreeNode {
     void setParent(TreeNode parent) {
         Parent = parent;
     }
-
+    TreeNode getParent(){
+        return Parent;
+    }
     TreeNode getChild(int i) {
         if (i > children.size() || i < 0) {
             return null;
@@ -90,4 +92,13 @@ public class TreeNode {
         }
         return null;
     }
+    TreeNode getToken(TokenType type){
+        for (TreeNode child : children) {
+            if(child.getValue().getClass() == Token.class && child.token.getKind() == type){
+                return child;
+            }
+        }
+        return null;
+    }    
+    
 }

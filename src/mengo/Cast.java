@@ -23,6 +23,7 @@ public class Cast {
 
     //LITSTRING
     public void StringCast(String StringVal) {
+        //System.out.println(StringVal);
         STRING = StringVal;
 
         if ("".equals(StringVal)) {
@@ -64,24 +65,30 @@ public class Cast {
                         break checker;
                     }
                 }
+                //return NUMBER;
             } else {
                 NUMBER = 0.0;
             }
         }
 
     }
-    public Cast(Object val){
-        if(val.getClass() == Double.class){
-            DoubleCast((Double)val);
-        }
-        if(val.getClass() == String.class){
-            StringCast((String)val);
-        }
-        if(val.getClass() == Boolean.class){
-            BoolCast((Boolean)val);
+
+    public Cast(Object val) {
+        if (val.getClass() == Double.class) {
+            DoubleCast((Double) val);
+        } else if (val.getClass() == String.class) {
+            String str = ((String) val).replace("\"", "");
+            StringCast(str);
+        } else if (val.getClass() == Boolean.class) {
+            BoolCast((Boolean) val);
+        } else {
+            String str = ((String) val).replace("\"", "");
+            StringCast(str);
         }
     }
+
     //NUMCONST
+
     public void DoubleCast(Double NumberVal) {
         STRING = NumberVal + "";
 

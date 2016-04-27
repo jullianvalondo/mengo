@@ -54,10 +54,14 @@ public class Rule {
     }
 
     Boolean MatchChildren(TreeNode ComparedTree) {
+        if(ComparedTree == null){
+            return false;
+        }
+        //System.out.println(ComparedTree.Variable);
         ArrayList<TreeNode> TreeChild = ComparedTree.getChildren();
-
+        //System.out.println();
         if (TreeChild.size() != RHS.size()) {
-            System.out.println("Not same");
+            //System.out.println("Not same");
             return false;
         } else {
             for (int i = 0; i < TreeChild.size(); i++) {

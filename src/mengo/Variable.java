@@ -11,11 +11,13 @@ package mengo;
  */
 public class Variable {
 
-    ID idAttributes;
-    private String Stringvalue;
-    private Boolean Boolvalue;
-    private Double Numbervalue;
-
+    final ID idAttributes;
+    private String Stringvalue = "";
+    private Boolean Boolvalue = true;
+    private Double Numbervalue = 0.0;
+    public Variable(ID Attributes){
+        idAttributes = Attributes;
+    }
     Object getValue() {
         if (idAttributes.getDataType() == DataType.BOOLEAN) {
             return Boolvalue;
@@ -30,6 +32,7 @@ public class Variable {
     }
 
     void setValue(Object A) {
+        idAttributes.Initialized();
         if (A.getClass() == String.class) {
             Stringvalue =(String) A;
             Boolvalue =  null;
@@ -45,6 +48,17 @@ public class Variable {
             Boolvalue =  null;
             Numbervalue = (Double)A;
         }
-
+    }
+    public String toString(){
+        if (idAttributes.getDataType() == DataType.BOOLEAN) {
+            return Boolvalue + "";
+        }
+        if (idAttributes.getDataType() == DataType.NUMBER) {
+            return Numbervalue + "";
+        }
+        if (idAttributes.getDataType() == DataType.STRING) {
+            return Stringvalue;
+        }
+        return Stringvalue;
     }
 }

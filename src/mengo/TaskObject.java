@@ -48,4 +48,7 @@ public class TaskObject{
     ArrayList<ID> getParameterProtocol(){
         return Protocol;
     }
+    TreeNode getStatementList(){
+        return StatementList;
+    }
 }

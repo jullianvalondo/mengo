@@ -13,7 +13,9 @@ public class ID {
     private final DataType datatype;
     private final String idName;
     private final Boolean isPermanent;
+    private Boolean isInitialized;
     ID(String Name, DataType dataType, Boolean Permanent){
+        isInitialized = false;
         idName = Name;
         datatype = dataType;
         isPermanent = Permanent;
@@ -29,6 +31,12 @@ public class ID {
     }
     public String toString(){
         return idName + " " + datatype.name() + " " + isPermanent.toString();
+    }
+    public void Initialized(){
+        isInitialized = true;
+    }
+    Boolean isInitialized(){
+        return isInitialized;
     }
 }
 enum DataType{
